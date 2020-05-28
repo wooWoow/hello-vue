@@ -1,0 +1,18 @@
+
+@charset "utf-8";
+ 
+body { font:14px "microsoft Yahei","Arial",sans-serif; color: #333; background: #fff; word-wrap:break-word; -webkit-tap-highlight-color:rgba(0,0,0,0); overflow-x: hidden}
+body,form,input,p,ol,ul,li,h1,h2,h3,h4,h5,h6,table,th,td,dl,dt,dd{padding:0;margin:0;}
+img{border:0; vertical-align: middle;}
+ul,li{list-style:none;}
+dl,dt,dd{display: block;}
+a{text-decoration:none; transition: 0.4s; -webkit-transition: 0.4s; outline: none;}
+input,textarea{ box-sizing: border-box;  border: 0; background:none; font:14px "microsoft Yahei","Arial",sans-serif; width: 100%; }
+input[type="button"], input[type="submit"], input[type="text"] {-webkit-appearance: none; outline: none; }
+i{ font-style:normal;}
+b{ font-weight:normal;}
+ 
+/* 清除浮动 溢出隐藏 .cl .header .main .footer */
+.cl:before, body:before, .header:before, .main:before, .footer:before { content: ''; display: table }
+.cl:after, after, .header:after, .main:after, .footer:after { content: ''; display: table; clear: both }
+.cl, .header, .main, .footer { *zoom: 1 }

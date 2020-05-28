@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,  // 可以直接在 TypeScript 中引用 JavaScript（无声明文件）的库，所有的引入都会被默认为any类型。
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
@@ -31,7 +32,7 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx", "src/service/tool.js", "src/service/request.js"
   ],
   "exclude": [
     "node_modules"
