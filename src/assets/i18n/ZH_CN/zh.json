@@ -3,5 +3,8 @@
     "btn_test": "测试",
     "btn_language": "语言",
     "user_name_placeholder": "请输入用户名",
-    "password_placeholder": "请输入密码"
+    "password_placeholder": "请输入密码",
+    "link_login": "登陆",
+    "link_home": "首页",
+    "link_about": "关于"
 }

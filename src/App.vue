@@ -1,12 +1,51 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/">{{$t('link_home')}}</router-link> |
+      <router-link to="/about">{{$t('link_about')}}</router-link>
+      <router-link class="top-item" to="/login">{{$t('link_login')}}</router-link>
+
+      <a-select class="top-item language-select" label-in-value :default-value="language" style="width: 120px" @change="handleChange">
+        <a-select-option value="zh">
+          中文
+        </a-select-option>
+        <a-select-option value="en">
+          English
+        </a-select-option>
+      </a-select>
     </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      language: {
+        key: localStorage.getItem('locale') === 'zh' ? 'zh' : 'en'
+      }
+    };
+  },
+  mounted () {
+    this.$nextTick(() => {
+      // To disabled submit button at the beginning.
+      this.language.key = localStorage.getItem('locale') === 'zh' ? 'zh' : 'en';
+      console.log('AAAA');
+      console.log(this.language.key);
+    });
+  },
+  methods: {
+    handleChange (value) {
+      const type = value.key;
+      // 此处做了语言选择记录
+      localStorage.setItem('locale', type);
+      // 修改显示语言
+      this.$i18n.locale = type;
+    }
+  }
+};
+</script>
 
 <style lang="scss">
 #app {
@@ -18,7 +57,11 @@
 }
 
 #nav {
-  padding: 30px;
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
 
   a {
     font-weight: bold;
@@ -27,6 +70,16 @@
     &.router-link-exact-active {
       color: #42b983;
     }
+  }
+
+  .top-item {
+    float: right;
+    margin-right: 30px;
+    vertical-align: middle;
+  }
+
+  .language-select {
+    margin-top: 10px;
   }
 }
 </style>
