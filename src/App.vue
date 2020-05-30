@@ -23,16 +23,19 @@ export default {
   data () {
     return {
       language: {
-        key: localStorage.getItem('locale') === 'zh' ? 'zh' : 'en'
+        key: localStorage.getItem('locale') ? localStorage.getItem('locale') : 'zh'
       }
     };
   },
   mounted () {
     this.$nextTick(() => {
       // To disabled submit button at the beginning.
-      this.language.key = localStorage.getItem('locale') === 'zh' ? 'zh' : 'en';
-      console.log('AAAA');
-      console.log(this.language.key);
+      if (localStorage.getItem('locale')){
+        this.language.key = localStorage.getItem('locale');
+      } else {
+        this.language.key = 'zh';
+        localStorage.setItem('locale', 'zh');
+      }
     });
   },
   methods: {
