@@ -1,5 +1,6 @@
 <template>
   <div class="hello">
+    <img src="@img/logo.png" alt="haha">
     <h1>{{msg}}</h1>
   </div>
 </template>

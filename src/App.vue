@@ -30,7 +30,7 @@ export default {
   mounted () {
     this.$nextTick(() => {
       // To disabled submit button at the beginning.
-      if (localStorage.getItem('locale')){
+      if (localStorage.getItem('locale')) {
         this.language.key = localStorage.getItem('locale');
       } else {
         this.language.key = 'zh';
