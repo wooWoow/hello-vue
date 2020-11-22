@@ -50,7 +50,7 @@ module.exports = {
     }, // 错误、警告在页面弹出
     proxy: {
       "/v1/": {
-        target: "http://192.168.0.111:3000",
+        target: "http://192.168.50.181:3000",
         changeOrigin: true, // 允许websockets跨域
         // ws: true,
         pathRewrite: {

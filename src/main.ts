@@ -1,40 +1,40 @@
 /* eslint-disable */
-import Vue from 'vue'
-import App from './App.vue'
-import './registerServiceWorker'
-import router from './router'
-import store from './store'
+import Vue from "vue";
+import App from "./App.vue";
+import "./registerServiceWorker";
+import router from "./router";
+import store from "./store";
 
 // 引入Antd
-import Antd from 'ant-design-vue'
-import 'ant-design-vue/dist/antd.css'
+import Antd from "ant-design-vue";
+import "ant-design-vue/dist/antd.css";
 // 引入i18n国际化插件
-import VueI18n from 'vue-i18n'
+import VueI18n from "vue-i18n";
 
 // 公共样式
-import './assets/css/global.scss'
-import './assets/css/common.scss'
+import "./assets/css/global.scss";
+import "./assets/css/common.scss";
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 // 使用vue-i18n
-Vue.use(VueI18n)
+Vue.use(VueI18n);
 // 使用Antd
-Vue.use(Antd)
+Vue.use(Antd);
 
 // 注册i18n实例并引入语言文件，文件格式等下解析
 const i18n = new VueI18n({
-  locale: localStorage.getItem('locale') || 'zh',
+  locale: localStorage.getItem("locale") || "zh",
   messages: {
-    'zh': require('@/assets/i18n/ZH_CN/zh.json'),
-    'en': require('@/assets/i18n/EN_US/en.json')
+    zh: require("@/assets/i18n/ZH_CN/zh.json"),
+    en: require("@/assets/i18n/EN_US/en.json")
   }
-})
+});
 
 new Vue({
   router,
   store,
   i18n,
   render: h => h(App)
-}).$mount('#app')
+}).$mount("#app");
 
 /* eslint-disable no-new */

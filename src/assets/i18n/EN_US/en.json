@@ -6,5 +6,8 @@
     "password_placeholder": "Please enter your password",
     "link_login": "Login",
     "link_home": "Home",
-    "link_about": "About"
+    "link_about": "Notes",
+    "gold_price_enquiry": "Gold price Enquiry",
+    "btn_query": "Query",
+    "msg_query_success": "Query Success"
 }

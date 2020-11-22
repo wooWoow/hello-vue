@@ -63,6 +63,15 @@
         <h3>花生壳</h3>
         <p>sudo phddns</p>
       </div>
+      <div class="about-box-item">
+        <h3>pm2</h3>
+        <p>pm2 start xxx.js</p>
+        <p>pm2 list</p>
+        <p>pm2 monit</p>
+        <p>pm2 stop all</p>
+        <p>pm2 reload all</p>
+        <p>pm2 --help</p>
+      </div>
     </div>
   </div>
 </template>
