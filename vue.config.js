@@ -1,5 +1,6 @@
 const path = require("path");
 const CompressionWebpackPlugin = require("compression-webpack-plugin"); // 开启gzip压缩， 按需引用
+const MonacoEditorWebpackPlugin = require("monaco-editor-webpack-plugin");
 const productionGzipExtensions = /\.(js|css|json|txt|html|ico|svg)(\?.*)?$/i; // 开启gzip压缩， 按需写入
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin; // 打包分析
@@ -32,6 +33,9 @@ module.exports = {
       })
     );
     // End 生成 gzip 压缩文件
+
+    // monacoEditor配置
+    plugins.push(new MonacoEditorWebpackPlugin());
 
     config.plugins = [...config.plugins, ...plugins];
   },

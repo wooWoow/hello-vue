@@ -12,9 +12,7 @@
         {{ $t('btn_query') }}
       </a-button>
       <div class="monaco-box">
-        <MonacoEditor height="400" theme="vs-dark" language="json" :code="code" :editorOptions="options"
-          @mounted="onMounted" @codeChange="onCodeChange">
-        </MonacoEditor>
+        <div id='container' ref="container"></div>
       </div>
 
       <h2 class="top-title-box mt-20">执行命令</h2>
@@ -29,7 +27,7 @@
 
 <script>
 import Request from '../service/request';
-import MonacoEditor from 'vue-monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 
 export default {
   name: 'Operations',
@@ -77,34 +75,36 @@ export default {
       },
       // 黄金
       code: '',
-      editor: null,
-      options: {
-        selectOnLineNumbers: true,
-        roundedSelection: false,
-        readOnly: false,
-        cursorStyle: 'line',
-        automaticLayout: true,
-        glyphMargin: true,
-        showFoldingControls: "always",
+      monacoEditor: null,
+      nonacoConfig: {
+        value: '',
+        fontSize: 14,
+        language: 'javascript',
+        theme: 'vs-dark',
         formatOnPaste: true,
-        formatOnType: true,
-        folding: true
+        automaticLayout: true,
+        autoIndent: false, // 自动布局
+        readOnly: true,
+        scrollbar: {
+          verticalScrollbarSize: 5
+        }
       },
       // 命令
       commandStr: ''
-
     };
   },
-  components: {
-    MonacoEditor
-  },
   created: function () {
-    console.log('created');
+    setTimeout(() => {
+      this.initEditor();
+    },500);
   },
   destroyed: function () {
     console.log('destroyed');
   },
   methods: {
+    initEditor: function() {
+      this.monacoEditor = monaco.editor.create(this.$refs.container, this.nonacoConfig);
+    },
     handleChange (value) {
       this.goldSelet.selected = value;
     },
@@ -120,12 +120,7 @@ export default {
         .then(response => {
           if (response.data && response.data.code === 200 && response.data.data.code === 200) {
             that.$message.info(that.$i18n.tc('msg_query_success'));
-            that.editor.setValue(JSON.stringify(response.data.data));
-            that.editor.trigger('', 'editor.action.format');
-            that.editor.updateOptions({
-              readOnly: true
-            });
-            that.editor.setValue(that.editor.getValue()); // 强制刷新一次
+            that.monacoEditor.setValue(JSON.stringify(response.data.data, null, 2));
           }
         })
         .catch(error => {
@@ -161,6 +156,9 @@ export default {
 }
 .monaco-box {
   padding: 5px 20px;
+}
+#container {
+  height: 400px;
 }
 .top-title-box {
   display: block;
