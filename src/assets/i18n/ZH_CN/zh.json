@@ -7,7 +7,9 @@
     "link_login": "登陆",
     "link_home": "首页",
     "link_about": "笔记",
+    "link_tools": "工具",
     "gold_price_enquiry": "黄金价格查询",
     "btn_query": "查询",
-    "msg_query_success": "查询成功"
+    "msg_query_success": "查询成功",
+    "run_commond": "执行命令"
 }

@@ -2,7 +2,8 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">{{$t('link_home')}}</router-link> |
-      <router-link to="/about">{{$t('link_about')}}</router-link>
+      <router-link to="/about">{{$t('link_about')}}</router-link> |
+      <router-link to="/operations">{{$t('link_tools')}}</router-link>
       <router-link class="top-item" to="/login">{{$t('link_login')}}</router-link>
 
       <a-select class="top-item language-select" label-in-value :default-value="language" style="width: 120px" @change="handleChange">
@@ -57,6 +58,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  height: 100%;
 }
 
 #nav {

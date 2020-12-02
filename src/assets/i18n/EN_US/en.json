@@ -7,7 +7,9 @@
     "link_login": "Login",
     "link_home": "Home",
     "link_about": "Notes",
+    "link_tools": "Tools",
     "gold_price_enquiry": "Gold price Enquiry",
     "btn_query": "Query",
-    "msg_query_success": "Query Success"
+    "msg_query_success": "Query Success",
+    "run_commond": "Run Commond"
 }
