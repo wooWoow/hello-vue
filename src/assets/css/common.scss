@@ -13,10 +13,28 @@
     height: 100%;
 }
 
+.mt-10 {
+    margin-top: 10px;
+}
+
 .mt-20 {
     margin-top: 20px;
 }
 
+.mr-10 {
+    margin-right: 10px;
+}
+
+.mr-20 {
+    margin-right: 20px;
+}
+
 .cursor-pointer {
-    cursor:pointer
+    cursor: pointer
+}
+
+.hide-overflow-one {
+    white-space: nowrap; //不换行
+    overflow: hidden; //超出隐藏
+    text-overflow: ellipsis; //变成...
 }

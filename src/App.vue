@@ -2,7 +2,7 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">{{$t('link_home')}}</router-link> |
-      <router-link to="/about">{{$t('link_about')}}</router-link> |
+      <router-link to="/nodes">{{$t('link_about')}}</router-link> |
       <router-link to="/operations">{{$t('link_tools')}}</router-link>
       <router-link class="top-item" to="/login">{{$t('link_login')}}</router-link>
 
@@ -66,7 +66,6 @@ export default {
   height: 50px;
   line-height: 50px;
   border-bottom: 1px solid #ddd;
-  margin-bottom: 10px;
 
   a {
     font-weight: bold;

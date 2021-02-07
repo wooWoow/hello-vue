@@ -15,11 +15,21 @@ import VueI18n from "vue-i18n";
 import "./assets/css/global.scss";
 import "./assets/css/common.scss";
 
+// mavon-editor
+import mavonEditor from "mavon-editor";
+import "mavon-editor/dist/css/index.css";
+
+// iconfont svg
+import '@/assets/iconfont/iconfont';
+import '@/assets/iconfont/iconfont.css';
+
 Vue.config.productionTip = false;
 // 使用vue-i18n
 Vue.use(VueI18n);
 // 使用Antd
 Vue.use(Antd);
+// 使用mavon-editor
+Vue.use(mavonEditor);
 
 // 注册i18n实例并引入语言文件，文件格式等下解析
 const i18n = new VueI18n({
