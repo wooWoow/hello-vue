@@ -18,9 +18,15 @@
               </a-tooltip>
             </span>
           </div>
-          <svg class="iconfont cursor-pointer" @click="moveNodeToTrash(item)" aria-hidden="true">
+          <!-- 编辑 -->
+          <svg class="iconfont cursor-pointer" style="left: calc(100% - 48px)" @click="editModelChange(item)"
+            aria-hidden="true">
+            <use xlink:href="#icon-bianji"></use>
+          </svg>
+          <!-- 删除 -->
+          <svg class="iconfont cursor-pointer" style="left: calc(100% - 40px)" @click="moveNodeToTrash(item)"
+            aria-hidden="true">
             <use xlink:href="#icon-shanchu"></use>
-            <!-- use是复制一个图标的意思 -->
           </svg>
         </div>
       </div>
@@ -28,7 +34,7 @@
     <div class="node-right">
       <div class="node-title">
         <div class="node-title-box">
-          <a-input placeholder="Title" v-model="nodeTitle" />
+          <a-input placeholder="Title" :disabled="!editModel" v-model="nodeTitle" />
         </div>
         <a-button class="fr mt-10 mr-20" @click="saveContent">
           保存
@@ -39,7 +45,8 @@
       </div>
       <div class="edit-box">
         <mavon-editor ref="md" placeholder="请输入文档内容..." :boxShadow="false" id="mavon-editor" v-model="content"
-          :toolbars="toolbars" @imgAdd="$imgAdd" />
+          :toolbarsFlag="editModel" :toolbars="toolbars" :subfield="editModel" :defaultOpen="'preview'"
+          @imgAdd="$imgAdd" @change="$editorChange" />
       </div>
     </div>
   </div>
@@ -55,6 +62,7 @@ export default {
     return {
       nodeTitle: "",
       content: "",
+      editModel: false, // 编辑模式
       toolbars: {
         bold: true, // 粗体
         italic: true, // 斜体
@@ -87,7 +95,6 @@ export default {
         aligncenter: true, // 居中
         alignright: true, // 右对齐
         /* 2.2.1 */
-        subfield: true, // 单双栏模式
         preview: true // 预览
       },
       nodeList: [],
@@ -111,27 +118,42 @@ export default {
       formData.append('image', $file);
 
       const that = this;
-
       Request.post('/v1/info/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
         .then(function (response) {
           let path = response.data.data.path || '';
           path = window.location.origin + '/' + path;
-          that.$refs.md.$img2Url(pos, path);
+          setTimeout(() => {
+            that.$refs.md.$img2Url(pos, path);
+          }, 5000);
         })
         .catch(function (error) {
           console.log(error);
         });
     },
+    $editorChange (value, render) {
+      console.log(value);
+      console.log(render);
+    },
     saveContent () {
-      const formData = {
+      const regStr = window.location.origin;
+      let formData = {
         title: this.nodeTitle,
-        content: this.content.replace(window.location.origin, '{{REPLACE_URL}}'),
+        content: this.content.replace(new RegExp(regStr, 'g'), '{{REPLACE_URL}}'),
         userId: 1,
         type: 'raspberry'
       };
 
-      Request.post('/v1/info/node/save', formData).then(res => {
-        console.log(res);
+      if (this.activeNodeId !== '') {
+        formData = {
+          title: this.nodeTitle,
+          content: this.content.replace(new RegExp(regStr, 'g'), '{{REPLACE_URL}}'),
+          userId: 1,
+          nodeId: this.activeNodeId
+        };
+      }
+
+      Request.post('/v1/info/node/save', formData).then(() => {
+        this.queryNodeList(this.activeNodeId === '');
       });
     },
     queryNodeList (isInit) {
@@ -153,8 +175,9 @@ export default {
 
           if (isInit) {
             this.activeNodeId = this.nodeList[0].node_id || '';
-            this.queryNode();
           }
+          this.queryNode();
+          this.editModel = false;
         }
       });
     },
@@ -168,7 +191,7 @@ export default {
       Request.get('/v1/info/node/query', formData).then(res => {
         if (res?.data?.code === 200 && res?.data?.data.length > 0) {
           const node = res.data.data[0];
-          this.content = node.node_content.replace('{{REPLACE_URL}}', window.location.origin);
+          this.content = node.node_content.replace(/{{REPLACE_URL}}/g, window.location.origin);
           this.nodeTitle = node.node_title;
         }
       });
@@ -176,6 +199,7 @@ export default {
     clickNode (item) {
       this.activeNodeId = item.node_id;
       this.queryNode();
+      this.editModel = false;
     },
     moveNodeToTrash (item) {
       const url = `/v1/info/node/${item.node_id}`;
@@ -190,10 +214,15 @@ export default {
         }
       });
     },
+    editModelChange (item) {
+      this.clickNode(item);
+      this.editModel = true;
+    },
     createNode () {
       this.nodeTitle = '';
       this.content = '';
       this.activeNodeId = '';
+      this.editModel = true;
     }
   }
 };
@@ -242,6 +271,9 @@ export default {
   .ant-input:focus {
     box-shadow: none;
   }
+  .ant-input[disabled] {
+    background: none !important;
+  }
 }
 .node-item-box-active {
   background-color: #eee;
@@ -268,7 +300,6 @@ export default {
 .node-item svg {
   display: none;
   position: relative;
-  left: calc(100% - 28px);
   top: -34px;
 }
 .node-item-box {
