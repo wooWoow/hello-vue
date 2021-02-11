@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">{{$t('link_home')}}</router-link> |
+      <router-link class="ml-20" to="/">{{$t('link_home')}}</router-link> |
       <router-link to="/nodes">{{$t('link_about')}}</router-link> |
       <router-link to="/operations">{{$t('link_tools')}}</router-link>
       <router-link class="top-item" to="/login">{{$t('link_login')}}</router-link>
@@ -65,11 +65,13 @@ export default {
   width: 100%;
   height: 50px;
   line-height: 50px;
+  text-align: left;
   border-bottom: 1px solid #ddd;
 
   a {
     font-weight: bold;
     color: #2c3e50;
+    padding: 0 5px;
 
     &.router-link-exact-active {
       color: #42b983;

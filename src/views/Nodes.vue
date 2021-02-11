@@ -1,7 +1,17 @@
 <template>
   <div class="node-box">
     <div class="node-left">
-      <div class="top-title">最新文档</div>
+      <div class="top-title">
+        <span>{{showDustbin ? '回收站' : '最新文档'}}</span>
+        <!-- 垃圾箱 -->
+        <a-tooltip placement="right">
+          <template slot="title">
+            显示/隐藏 删除笔记
+          </template>
+          <i class="iconfont icon-lajixiang cursor-pointer" v-bind:style="{ color: showDustbin ? 'red':'' }"
+            @click="showDustbinFunc"></i>
+        </a-tooltip>
+      </div>
       <div class="node-left-overflow">
         <div class="node-item" v-for="item in nodeList" :key="item.node_id">
           <div class="node-item-box" :class="{'node-item-box-active': item.node_id === activeNodeId}"
@@ -20,11 +30,16 @@
           </div>
           <!-- 编辑 -->
           <svg class="iconfont cursor-pointer" style="left: calc(100% - 48px)" @click="editModelChange(item)"
-            aria-hidden="true">
+            aria-hidden="true" v-if="!showDustbin">
             <use xlink:href="#icon-bianji"></use>
           </svg>
-          <!-- 删除 -->
-          <svg class="iconfont cursor-pointer" style="left: calc(100% - 40px)" @click="moveNodeToTrash(item)"
+          <!-- 移出垃圾桶 -->
+          <svg class="iconfont cursor-pointer" style="left: calc(100% - 48px)" @click="moveNodeToTrash(item, false)"
+            aria-hidden="true" v-if="showDustbin">
+            <use xlink:href="#icon-fanhui"></use>
+          </svg>
+          <!-- 移入垃圾桶 / 删除 -->
+          <svg class="iconfont cursor-pointer" style="left: calc(100% - 40px)" @click="moveNodeToTrash(item, true)"
             aria-hidden="true">
             <use xlink:href="#icon-shanchu"></use>
           </svg>
@@ -34,19 +49,19 @@
     <div class="node-right">
       <div class="node-title">
         <div class="node-title-box">
-          <a-input placeholder="Title" :disabled="!editModel" v-model="nodeTitle" />
+          <a-input placeholder="Title" :disabled="!editModel" @change="$editorChange" v-model="nodeTitle" />
         </div>
-        <a-button class="fr mt-10 mr-20" @click="saveContent">
+        <a-button class="fr mt-10 mr-20" @click="saveContent" v-if="editModel && isNodeChange">
           保存
         </a-button>
-        <a-button class="fr mt-10 mr-20" @click="createNode">
+        <a-button class="fr mt-10 mr-20" @click="createNode" v-if="!isNodeChange && !showDustbin">
           新笔记
         </a-button>
       </div>
       <div class="edit-box">
         <mavon-editor ref="md" placeholder="请输入文档内容..." :boxShadow="false" id="mavon-editor" v-model="content"
           :toolbarsFlag="editModel" :toolbars="toolbars" :subfield="editModel" :defaultOpen="'preview'"
-          @imgAdd="$imgAdd" @change="$editorChange" />
+          @imgAdd="$imgAdd" @change="$editorChange" @save="saveContent" />
       </div>
     </div>
   </div>
@@ -62,7 +77,9 @@ export default {
     return {
       nodeTitle: "",
       content: "",
+      isNodeChange: false, // 笔记内容是否更改
       editModel: false, // 编辑模式
+      showDustbin: false, // 是否显示垃圾箱
       toolbars: {
         bold: true, // 粗体
         italic: true, // 斜体
@@ -102,7 +119,6 @@ export default {
     };
   },
   created: function () {
-    console.log('created');
     this.queryNodeList(true);
   },
   destroyed: function () {
@@ -125,14 +141,10 @@ export default {
           setTimeout(() => {
             that.$refs.md.$img2Url(pos, path);
           }, 5000);
-        })
-        .catch(function (error) {
-          console.log(error);
         });
     },
-    $editorChange (value, render) {
-      console.log(value);
-      console.log(render);
+    $editorChange () {
+      this.isNodeChange = true;
     },
     saveContent () {
       const regStr = window.location.origin;
@@ -159,11 +171,12 @@ export default {
     queryNodeList (isInit) {
       const formData = {
         params: {
-          userId: 1
+          userId: 1,
+          display: this.showDustbin ? 0 : 1
         }
       };
       Request.get('/v1/info/node/query', formData).then(res => {
-        if (res?.data?.code === 200 && res?.data?.data.length > 0) {
+        if (res?.data?.code === 200 && res?.data?.data) {
           const list = res.data.data;
           list.forEach((item) => {
             let dateTime = new Date(item.node_date);
@@ -173,15 +186,27 @@ export default {
           });
           this.nodeList = list;
 
-          if (isInit) {
+          if (isInit && this.nodeList.length > 0) {
             this.activeNodeId = this.nodeList[0].node_id || '';
+          } else if (isInit && this.nodeList.length === 0) {
+            this.activeNodeId = '';
           }
-          this.queryNode();
           this.editModel = false;
+          this.queryNode();
         }
       });
     },
     queryNode () {
+      if (this.activeNodeId === '') {
+        this.nodeTitle = '';
+        this.content = '';
+        this.activeNodeId = '';
+        this.editModel = false;
+
+        setTimeout(() => {
+          this.isNodeChange = false;
+        }, 100);
+      }
       const formData = {
         params: {
           userId: 1,
@@ -193,26 +218,51 @@ export default {
           const node = res.data.data[0];
           this.content = node.node_content.replace(/{{REPLACE_URL}}/g, window.location.origin);
           this.nodeTitle = node.node_title;
+
+          // 更新node状态
+          setTimeout(() => {
+            this.isNodeChange = false;
+          }, 100);
         }
       });
     },
     clickNode (item) {
+      if (this.isNodeChange) {
+        this.$message.error('笔记已编辑未保存');
+        return;
+      }
       this.activeNodeId = item.node_id;
-      this.queryNode();
       this.editModel = false;
+      this.queryNode(true);
     },
-    moveNodeToTrash (item) {
+    moveNodeToTrash (item, type) {
       const url = `/v1/info/node/${item.node_id}`;
       const formData = {
         params: {
           userId: 1
         }
       };
+      if (this.showDustbin && type) { // 删除
+      } else {
+        if (this.showDustbin && !type) { // 移出垃圾桶
+          formData.params.display = 1;
+        } else if (!this.showDustbin && type) { // 移入垃圾桶
+          formData.params.display = 0;
+        }
+      }
       Request.delete(url, formData).then(res => {
         if (res?.data?.code === 200) {
           this.queryNodeList(this.activeNodeId === item.node_id);
         }
       });
+    },
+    showDustbinFunc () {
+      if (this.isNodeChange) {
+        this.$message.error('笔记已编辑未保存');
+        return;
+      }
+      this.showDustbin = !this.showDustbin;
+      this.queryNodeList(true);
     },
     editModelChange (item) {
       this.clickNode(item);
@@ -223,6 +273,10 @@ export default {
       this.content = '';
       this.activeNodeId = '';
       this.editModel = true;
+
+      setTimeout(() => {
+        this.isNodeChange = false;
+      }, 100);
     }
   }
 };
@@ -251,6 +305,15 @@ export default {
   line-height: 50px;
   text-align: center;
   border-bottom: 1px solid #eee;
+  position: relative;
+}
+// 垃圾箱
+.top-title i {
+  position: absolute;
+  display: inline-block;
+  right: 5px;
+  font-size: 20px;
+  color: #ccc;
 }
 .node-title {
   @extend .top-title;
@@ -264,7 +327,7 @@ export default {
 .node-title-box {
   display: inline-block;
   height: 100%;
-  max-width: 500px;
+  width: 600px;
   .ant-input {
     border: none;
   }
