@@ -24,9 +24,15 @@ const routes: Array<RouteConfig> = [
     path: "/operations",
     name: "Operations",
     component: () => import("../views/Operations.vue")
-  },{
+  },
+  {
+    path: "/test",
+    name: "test",
+    component: () => import("../../test.vue")
+  },
+  {
     path: "*",
-    redirect: '/'
+    redirect: "/"
   }
 ];
 

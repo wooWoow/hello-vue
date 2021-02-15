@@ -3,12 +3,22 @@
     <div class="node-left">
       <div class="top-title">
         <span>{{showDustbin ? '回收站' : '最新文档'}}</span>
+        <!-- 分类筛选 -->
+        <span class="fr mr-40">分类：{{screenTypeStr}}</span>
+        <a-select class="fr mt-10 mr-30 screenTypeBox" v-model="screenTypeId" @change="screenTypeChange">
+          <a-select-option value="all">
+            全部
+          </a-select-option>
+          <a-select-option v-for="type in nodeTypeList" :value="type.node_type_id" :key="type.node_id">
+            {{type.node_type_str}}
+          </a-select-option>
+        </a-select>
         <!-- 垃圾箱 -->
         <a-tooltip placement="right">
           <template slot="title">
             显示/隐藏 删除笔记
           </template>
-          <i class="iconfont icon-lajixiang cursor-pointer" v-bind:style="{ color: showDustbin ? 'red':'' }"
+          <i class="iconfont icon-lajixiang cursor-pointer" v-bind:style="{ color: showDustbin ? '#42b983':'' }"
             @click="showDustbinFunc"></i>
         </a-tooltip>
       </div>
@@ -24,7 +34,7 @@
                   {{item.time}}
                 </template>
                 <span class="mr-10">{{item.date}}</span>
-                <span class="node-item-type">{{item.node_type}}</span>
+                <span class="node-item-type">{{item.node_type_str}}</span>
               </a-tooltip>
             </span>
           </div>
@@ -57,6 +67,33 @@
         <a-button class="fr mt-10 mr-20" @click="createNode" v-if="!isNodeChange && !showDustbin">
           新笔记
         </a-button>
+        <!-- 笔记分类 -->
+        <a-tooltip placement="bottom" v-show="editModel">
+          <template slot="title">
+            编辑分类
+          </template>
+          <i class="fr iconfont icon-shaixuan cursor-pointer mr-30" @click="editNodeType"></i>
+        </a-tooltip>
+        <a-select class="fr mt-10 mr-10" v-model="nodeTypeId" :disabled="!editModel" style="width: 120px"
+          @change="nodeTypeChange">
+          <a-select-option v-for="type in nodeTypeList" :value="type.node_type_id" :key="type.node_id">
+            {{type.node_type_str}}
+          </a-select-option>
+        </a-select>
+        <span class="fr">分类：</span>
+        <!-- 编辑笔记 -->
+        <a-modal v-model="showEditNodeTypy" title="编辑笔记类型" :footer="null">
+          <div>
+            <a-input class="mb-20 add_type_input" v-model="addNodeTypeStr" @pressEnter="addNodeType"
+              placeholder="新增类型" />
+            <span class="add_type_tip">回车即可保存</span>
+          </div>
+          <a-table :columns="typeColumns" :data-source="typeManageData" size="middle">
+            <span slot="options" slot-scope="options">
+              <a @click="delNodeType(options)">删除</a>
+            </span>
+          </a-table>
+        </a-modal>
       </div>
       <div class="edit-box">
         <mavon-editor ref="md" placeholder="请输入文档内容..." :boxShadow="false" id="mavon-editor" v-model="content"
@@ -69,7 +106,26 @@
 <script>
 import Request from '../service/request';
 import { dateFormat } from '@/service/tool';
-// import * as _ from 'lodash';
+import * as _ from 'lodash';
+
+const typeColumns = [
+  {
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id'
+  },
+  {
+    title: '名称',
+    dataIndex: 'name',
+    key: 'name'
+  },
+  {
+    title: '操作',
+    dataIndex: 'options',
+    key: 'options',
+    scopedSlots: { customRender: 'options' }
+  }
+];
 
 export default {
   name: 'Nodes',
@@ -77,9 +133,20 @@ export default {
     return {
       nodeTitle: "",
       content: "",
+      nodeList: [],
+      activeNodeId: '',
+
+      nodeTypeList: [],
+      nodeTypeId: '',
+      screenTypeId: 'all', // 筛选类型
+      typeManageData: [],
+      typeColumns,
+      addNodeTypeStr: '',
+
       isNodeChange: false, // 笔记内容是否更改
       editModel: false, // 编辑模式
       showDustbin: false, // 是否显示垃圾箱
+      showEditNodeTypy: false, // 显示笔记类型编辑modal
       toolbars: {
         bold: true, // 粗体
         italic: true, // 斜体
@@ -113,13 +180,20 @@ export default {
         alignright: true, // 右对齐
         /* 2.2.1 */
         preview: true // 预览
-      },
-      nodeList: [],
-      activeNodeId: ''
+      }
     };
+  },
+  // 计算属性
+  computed: {
+    screenTypeStr: function () {
+      return _.find(this.nodeTypeList, item => {
+        return item.node_type_id === this.screenTypeId;
+      })?.node_type_str || '全部';
+    }
   },
   created: function () {
     this.queryNodeList(true);
+    this.queryNodeType();
   },
   destroyed: function () {
     console.log('destroyed');
@@ -146,13 +220,67 @@ export default {
     $editorChange () {
       this.isNodeChange = true;
     },
+    queryNodeType () {
+      Request.get('/v1/info/node/type').then((res) => {
+        if (res?.data?.code === 200 && res?.data?.data) {
+          this.nodeTypeList = res.data.data;
+
+          const formatList = _.map(this.nodeTypeList, item => {
+            return {
+              options: item.node_type_id,
+              id: item.node_type_id,
+              key: item.node_type_id,
+              name: item.node_type_str
+            };
+          });
+          this.typeManageData = formatList;
+        }
+      });
+    },
+    nodeTypeChange () {
+      this.isNodeChange = true;
+    },
+    screenTypeChange () {
+      this.queryNodeList(true);
+    },
+    editNodeType () {
+      this.showEditNodeTypy = true;
+    },
+    addNodeType () {
+      if (!this.addNodeTypeStr) {
+        return;
+      }
+      const formData = {
+        nodeTypeStr: this.addNodeTypeStr.trim()
+      };
+      Request.post('/v1/info/node/type/add', formData).then(res => {
+        if (res?.data?.code === 501) {
+          this.$message.error(res.data.data.err);
+        } else {
+          this.$message.success('新增成功');
+          this.queryNodeType();
+          this.addNodeTypeStr = '';
+        }
+      });
+    },
+    delNodeType (nodeTypeId) {
+      const url = `/v1/info/node/type/${nodeTypeId}`;
+      Request.delete(url).then(res => {
+        if (res?.data?.code === 501) {
+          this.$message.error(res.data.data.err);
+        } else {
+          this.$message.success('删除成功');
+          this.queryNodeType();
+        }
+      });
+    },
     saveContent () {
       const regStr = window.location.origin;
       let formData = {
         title: this.nodeTitle,
         content: this.content.replace(new RegExp(regStr, 'g'), '{{REPLACE_URL}}'),
         userId: 1,
-        type: 'raspberry'
+        nodeTypeId: this.nodeTypeId
       };
 
       if (this.activeNodeId !== '') {
@@ -160,12 +288,15 @@ export default {
           title: this.nodeTitle,
           content: this.content.replace(new RegExp(regStr, 'g'), '{{REPLACE_URL}}'),
           userId: 1,
+          nodeTypeId: this.nodeTypeId,
           nodeId: this.activeNodeId
         };
       }
 
-      Request.post('/v1/info/node/save', formData).then(() => {
-        this.queryNodeList(this.activeNodeId === '');
+      Request.post('/v1/info/node/save', formData).then((res) => {
+        if (res?.data?.code === 200) {
+          this.queryNodeList(this.activeNodeId === '');
+        }
       });
     },
     queryNodeList (isInit) {
@@ -184,7 +315,17 @@ export default {
             item.date = dateTime.year + '-' + dateTime.month + '-' + dateTime.day;
             item.time = dateTime.hour + ':' + dateTime.minute + ':' + dateTime.sec;
           });
-          this.nodeList = list;
+
+          // 分类筛选
+          if (this.screenTypeId !== 'all') {
+            const screenList = [];
+            list.forEach((item) => {
+              item.node_type_id === this.screenTypeId && screenList.push(item);
+            });
+            this.nodeList = screenList;
+          } else {
+            this.nodeList = list;
+          }
 
           if (isInit && this.nodeList.length > 0) {
             this.activeNodeId = this.nodeList[0].node_id || '';
@@ -218,6 +359,7 @@ export default {
           const node = res.data.data[0];
           this.content = node.node_content.replace(/{{REPLACE_URL}}/g, window.location.origin);
           this.nodeTitle = node.node_title;
+          this.nodeTypeId = node.node_type_id;
 
           // 更新node状态
           setTimeout(() => {
@@ -273,6 +415,7 @@ export default {
       this.content = '';
       this.activeNodeId = '';
       this.editModel = true;
+      this.nodeTypeId = this.nodeTypeList?.[0]?.node_type_id;
 
       setTimeout(() => {
         this.isNodeChange = false;
@@ -303,22 +446,49 @@ export default {
 .top-title {
   height: 50px;
   line-height: 50px;
-  text-align: center;
+  text-align: left;
+  margin-left: 20px;
   border-bottom: 1px solid #eee;
   position: relative;
 }
 // 垃圾箱
-.top-title i {
+.top-title .icon-lajixiang {
   position: absolute;
   display: inline-block;
   right: 5px;
-  font-size: 20px;
+  font-size: 18px;
+  color: #ccc;
+}
+// 分类筛选
+.top-title .icon-shaixuan {
+  display: inline-block;
+  font-size: 18px;
   color: #ccc;
 }
 .node-title {
   @extend .top-title;
   text-align: left;
-  padding-left: 20px;
+}
+.screenTypeBox {
+  opacity: 0;
+  position: absolute;
+  width: 120px;
+  left: 75px;
+  z-index: 2;
+}
+.screenTypeBox:hover {
+  opacity: 1;
+}
+.ant-select-dropdown {
+  top: 50px !important;
+}
+.add_type_input {
+  width: 200px;
+}
+.add_type_tip {
+  color: #ddd;
+  margin-left: 10px;
+  font-weight: 300;
 }
 .node-left-overflow {
   height: calc(100% - 50px);
@@ -330,6 +500,7 @@ export default {
   width: 600px;
   .ant-input {
     border: none;
+    font-weight: bold;
   }
   .ant-input:focus {
     box-shadow: none;
