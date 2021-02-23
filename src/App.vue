@@ -4,9 +4,15 @@
       <router-link class="ml-20" to="/">{{$t('link_home')}}</router-link> |
       <router-link to="/nodes">{{$t('link_about')}}</router-link> |
       <router-link to="/operations">{{$t('link_tools')}}</router-link>
-      <router-link class="top-item" to="/login">{{$t('link_login')}}</router-link>
 
-      <a-select class="top-item language-select" label-in-value :default-value="language" style="width: 120px" @change="handleChange">
+      <!-- 登陆 -->
+      <router-link v-if="!userId" class="top-item" to="/login">{{$t('link_login')}}</router-link>
+      <a-popconfirm title="退出当前登陆?" ok-text="退出" cancel-text="取消" @confirm="loginOut">
+        <span class="top-item cursor-pointer">{{userName}}</span>
+      </a-popconfirm>
+
+      <a-select class="top-item language-select" label-in-value :default-value="language" style="width: 120px"
+        @change="handleChange">
         <a-select-option value="zh">
           中文
         </a-select-option>
@@ -20,6 +26,9 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import { getToken, logoutNow } from './service/tool';
+
 export default {
   data () {
     return {
@@ -27,6 +36,12 @@ export default {
         key: localStorage.getItem('locale') ? localStorage.getItem('locale') : 'zh'
       }
     };
+  },
+  computed: {
+    ...mapState([
+      'userName',
+      'userId'
+    ])
   },
   mounted () {
     this.$nextTick(() => {
@@ -39,6 +54,25 @@ export default {
       }
     });
   },
+  created: function () {
+    const isLogin = getToken();
+    if (isLogin) {
+      // 根据vuex更新当前登陆状态
+      const userName = this.$cookies.isKey('userName') && this.$cookies.get('userName');
+      const userId = this.$cookies.isKey('userId') && this.$cookies.get('userId');
+      if (userId && userName) {
+        this.$store.commit({
+          type: 'changeUserInfo',
+          userId,
+          userName
+        });
+      } else {
+        this.loginOut();
+      }
+    } else {
+      logoutNow();
+    }
+  },
   methods: {
     handleChange (value) {
       const type = value.key;
@@ -46,6 +80,10 @@ export default {
       localStorage.setItem('locale', type);
       // 修改显示语言
       this.$i18n.locale = type;
+    },
+    loginOut () {
+      logoutNow();
+      window.location.reload();
     }
   }
 };

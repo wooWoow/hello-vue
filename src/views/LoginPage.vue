@@ -1,7 +1,7 @@
 <template>
-  <div class="login">
-    <a-form layout="vertical" :form="form" @submit="handleSubmit">
-      <a-form-item :validate-status="userNameError() ? 'error' : ''" :help="userNameError() || ''">
+  <div class="login mt-10">
+    <a-form layout="vertical" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" :form="form" @submit="handleSubmit">
+      <a-form-item label="Name" :validate-status="userNameError() ? 'error' : ''" :help="userNameError() || ''">
         <a-input v-decorator="[
           'username',
           { rules: [{ required: true, message: 'Please input your username!' }] },
@@ -9,7 +9,7 @@
           <a-icon slot="prefix" type="user" style="color:rgba(0,0,0,.25)" />
         </a-input>
       </a-form-item>
-      <a-form-item :validate-status="passwordError() ? 'error' : ''" :help="passwordError() || ''">
+      <a-form-item label="Password" :validate-status="passwordError() ? 'error' : ''" :help="passwordError() || ''">
         <a-input v-decorator="[
           'password',
           { rules: [{ required: true, message: 'Please input your Password!' }] },
@@ -28,6 +28,7 @@
 
 <script>
 import Request from '../service/request';
+import { setToken } from '../service/tool';
 
 export default {
   name: 'Login',
@@ -52,10 +53,29 @@ export default {
     // 登陆
     loginNow (data) {
       Request.post('/v1/users/login', data)
-        .then(function (response) {
-          console.log(response);
+        .then(response => {
+          if (response.data.code === 200) {
+            this.$message.success('登陆成功');
+
+            // 将token持久化，请求时带入header
+            setToken(response.data.data.token);
+
+            // 用户信息同步至cookie
+            const userId = response.data.data.userId;
+            const userName = response.data.data.userName;
+            this.$cookies.set('userName', userName);
+            this.$cookies.set('userId', userId);
+
+            this.$store.commit({
+              type: 'changeUserInfo',
+              userId,
+              userName
+            });
+          } else {
+            this.$message.error('登陆失败');
+          }
         })
-        .catch(function (error) {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -89,21 +109,21 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@media screen and (min-width: 320px){
-    .login .ant-form-item {
-      margin: 0 30px;
-    }
+@media screen and (min-width: 320px) {
+  .login .ant-form-item {
+    margin: 0 30px;
+  }
 }
 
-@media screen and (min-width: 640px){
-    .login .ant-form-item {
-      margin: 0 200px;
-    }
+@media screen and (min-width: 640px) {
+  .login .ant-form-item {
+    margin: 0 150px;
+  }
 }
 
-@media screen and (min-width: 1000px){
-    .login .ant-form-item {
-      margin: 0 300px;
-    }
+@media screen and (min-width: 1000px) {
+  .login .ant-form-item {
+    margin: 0 200px;
+  }
 }
 </style>

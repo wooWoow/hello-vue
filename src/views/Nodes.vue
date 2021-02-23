@@ -279,7 +279,7 @@ export default {
       let formData = {
         title: this.nodeTitle,
         content: this.content.replace(new RegExp(regStr, 'g'), '{{REPLACE_URL}}'),
-        userId: 1,
+        userId: this.$store.state.userId,
         nodeTypeId: this.nodeTypeId
       };
 
@@ -287,7 +287,7 @@ export default {
         formData = {
           title: this.nodeTitle,
           content: this.content.replace(new RegExp(regStr, 'g'), '{{REPLACE_URL}}'),
-          userId: 1,
+          userId: this.$store.state.userId,
           nodeTypeId: this.nodeTypeId,
           nodeId: this.activeNodeId
         };
@@ -302,7 +302,7 @@ export default {
     queryNodeList (isInit) {
       const formData = {
         params: {
-          userId: 1,
+          userId: this.$store.state.userId,
           display: this.showDustbin ? 0 : 1
         }
       };
@@ -350,7 +350,7 @@ export default {
       }
       const formData = {
         params: {
-          userId: 1,
+          userId: this.$store.state.userId,
           nodeId: this.activeNodeId
         }
       };
@@ -381,7 +381,7 @@ export default {
       const url = `/v1/info/node/${item.node_id}`;
       const formData = {
         params: {
-          userId: 1
+          userId: this.$store.state.userId
         }
       };
       if (this.showDustbin && type) { // 删除

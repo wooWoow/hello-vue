@@ -1,6 +1,9 @@
 /* eslint-disable */
 import axios from "axios";
 import { getToken } from "./tool";
+import * as _ from "lodash";
+import { logoutNow } from "./tool";
+import { message } from "ant-design-vue";
 
 const DevBaseUrl = "/";
 const ProdBashUrl = "/";
@@ -17,7 +20,7 @@ if (token) {
 let request = axios.create(config);
 
 // http request 拦截器
-axios.interceptors.request.use(
+request.interceptors.request.use(
   config => {
     if (window) {
       let token = getToken();
@@ -27,12 +30,47 @@ axios.interceptors.request.use(
       }
     }
     if (config.method === "get") {
-      config.url = config.url + "timestamp=" + Date.now().toString();
+      // get请求统一加上时间戳，防止浏览器缓存
+      if (config.params) {
+        config.params["timestamp"] = Date.now().toString();
+      } else {
+        config.params = {};
+        config.params["timestamp"] = Date.now().toString();
+      }
     }
     return config;
   },
   err => {
     return Promise.reject(err);
+  }
+);
+
+// 防抖动
+const throttleInstance = _.throttle(
+  function() {
+    // 401时移除登陆信息
+    logoutNow();
+
+    message.error('用户未登录!!'); 
+  },
+  5000,
+  {
+    leading: true,
+    trailing: false
+  }
+);
+
+// 响应拦截
+request.interceptors.response.use(
+  response => {
+    // 响应成功回调
+    return response;
+  },
+  err => {
+    if (err.response.status === 401) {
+      throttleInstance();
+    }
+    return Promise.reject(err.response.status); // 返回接口返回的错误信息
   }
 );
 
