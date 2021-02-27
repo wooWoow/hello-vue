@@ -71,6 +71,8 @@ export default {
               userId,
               userName
             });
+
+            this.$router.push('/');
           } else {
             this.$message.error('登陆失败');
           }

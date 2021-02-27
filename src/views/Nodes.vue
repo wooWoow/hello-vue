@@ -497,7 +497,7 @@ export default {
 .node-title-box {
   display: inline-block;
   height: 100%;
-  width: 600px;
+  max-width: 400px;
   .ant-input {
     border: none;
     font-weight: bold;
