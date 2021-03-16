@@ -23,6 +23,7 @@ module.exports = {
     'space-before-function-paren': [0, 'always'], //函数定义时括号前面要不要有空格
     '@typescript-eslint/no-this-alias': [0, 'always'], // 不允许this别名
     'comma-spacing': [0, 'always'],
+    'comma-dangle': [0, 'always'],
     '@typescript-eslint/no-explicit-any': [0, 'always'] // any类型检测
   }
 }

@@ -89,6 +89,16 @@ let Tool = {
     Tool.delToken();
     Tool.delCookie("userName");
     Tool.delCookie("userId");
+  },
+  userStatusFormat: status => {
+    switch (status) {
+      case "0":
+        return "正常";
+      case "1":
+        return "冻结";
+      case "2":
+        return "删除";
+    }
   }
 };
 module.exports = {

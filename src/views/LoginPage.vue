@@ -3,7 +3,7 @@
     <a-form layout="vertical" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" :form="form" @submit="handleSubmit">
       <a-form-item label="Name" :validate-status="userNameError() ? 'error' : ''" :help="userNameError() || ''">
         <a-input v-decorator="[
-          'username',
+          'userName',
           { rules: [{ required: true, message: 'Please input your username!' }] },
         ]" :placeholder="$t('user_name_placeholder')">
           <a-icon slot="prefix" type="user" style="color:rgba(0,0,0,.25)" />
@@ -11,7 +11,7 @@
       </a-form-item>
       <a-form-item label="Password" :validate-status="passwordError() ? 'error' : ''" :help="passwordError() || ''">
         <a-input v-decorator="[
-          'password',
+          'passWord',
           { rules: [{ required: true, message: 'Please input your Password!' }] },
         ]" type="password" :placeholder="$t('password_placeholder')">
           <a-icon slot="prefix" type="lock" style="color:rgba(0,0,0,.25)" />
@@ -61,10 +61,10 @@ export default {
             setToken(response.data.data.token);
 
             // 用户信息同步至cookie
-            const userId = response.data.data.userId;
-            const userName = response.data.data.userName;
-            this.$cookies.set('userName', userName);
+            const userId = response.data.data.user.userId;
+            const userName = response.data.data.user.userName;
             this.$cookies.set('userId', userId);
+            this.$cookies.set('userName', userName);
 
             this.$store.commit({
               type: 'changeUserInfo',
@@ -85,13 +85,13 @@ export default {
     // 姓名校验
     userNameError () {
       const { getFieldError, isFieldTouched } = this.form;
-      return isFieldTouched('username') && getFieldError('username');
+      return isFieldTouched('userName') && getFieldError('userName');
     },
 
     // 密码校验
     passwordError () {
       const { getFieldError, isFieldTouched } = this.form;
-      return isFieldTouched('password') && getFieldError('password');
+      return isFieldTouched('passWord') && getFieldError('passWord');
     },
 
     handleSubmit (e) {

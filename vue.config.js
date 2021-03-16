@@ -61,6 +61,14 @@ module.exports = {
         pathRewrite: {
           "^/api": ""
         }
+      }, "/upload/": {
+        // target: "http://192.168.50.181:3000",
+        target: "http://localhost:3000",
+        changeOrigin: true, // 允许websockets跨域
+        // ws: true,
+        pathRewrite: {
+          "^/api": ""
+        }
       }
     } // 代理转发配置，用于调试环境
   },

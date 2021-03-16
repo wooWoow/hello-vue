@@ -26,6 +26,11 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/Operations.vue")
   },
   {
+    path: "/account",
+    name: "AccountManage",
+    component: () => import("../views/AccountManage.vue")
+  },
+  {
     path: "/test",
     name: "test",
     component: () => import("../../test.vue")

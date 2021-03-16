@@ -7,9 +7,20 @@
 
       <!-- 登陆 -->
       <router-link v-if="!userId" class="top-item" to="/login">{{$t('link_login')}}</router-link>
-      <a-popconfirm title="退出当前登陆?" ok-text="退出" cancel-text="取消" @confirm="loginOut">
-        <span class="top-item cursor-pointer">{{userName}}</span>
-      </a-popconfirm>
+      <a-dropdown class="top-item" v-if="userId">
+        <a class="ant-dropdown-link" @click="e => e.preventDefault()">
+          {{userName}}
+          <a-icon type="down" />
+        </a>
+        <a-menu slot="overlay">
+          <a-menu-item>
+            <a @click="accountManage">账户管理</a>
+          </a-menu-item>
+          <a-menu-item>
+            <a @click="loginOut">退出登录</a>
+          </a-menu-item>
+        </a-menu>
+      </a-dropdown>
 
       <a-select class="top-item language-select" label-in-value :default-value="language" style="width: 120px"
         @change="handleChange">
@@ -26,6 +37,7 @@
 </template>
 
 <script>
+import Request from './service/request';
 import { mapState } from 'vuex';
 import { getToken, logoutNow } from './service/tool';
 
@@ -57,14 +69,26 @@ export default {
   created: function () {
     const isLogin = getToken();
     if (isLogin) {
-      // 根据vuex更新当前登陆状态
-      const userName = this.$cookies.isKey('userName') && this.$cookies.get('userName');
+      // 更新vuex用户数据
       const userId = this.$cookies.isKey('userId') && this.$cookies.get('userId');
-      if (userId && userName) {
-        this.$store.commit({
-          type: 'changeUserInfo',
-          userId,
-          userName
+      const userName = this.$cookies.isKey('userName') && this.$cookies.get('userName');
+
+      if (userId || userName) {
+        Request.get('/v1/users/getUserInfo', {
+          params: {
+            userId,
+            userName
+          }
+        }).then(res => {
+          if (res?.data?.data?.[0]) {
+            const userInfo = res.data.data[0];
+
+            this.$store.commit({
+              type: 'changeUserInfo',
+              userId: userInfo.user_id,
+              userName: userInfo.user_name
+            });
+          }
         });
       } else {
         this.loginOut();
@@ -83,7 +107,11 @@ export default {
     },
     loginOut () {
       logoutNow();
+      this.$router.replace({ path: '/' });
       window.location.reload();
+    },
+    accountManage () {
+      this.$router.push('/account');
     }
   }
 };
@@ -120,7 +148,7 @@ export default {
 
   .top-item {
     float: right;
-    margin-right: 30px;
+    margin-right: 20px;
     vertical-align: middle;
   }
 

@@ -10,8 +10,8 @@ export default new Vuex.Store({
   },
   mutations: {
     changeUserInfo (state, payload) {
-      state.userId = payload.userId;
-      state.userName = payload.userName;
+      payload.userId !== undefined && (state.userId = payload.userId);
+      payload.userName !== undefined && (state.userName = payload.userName);
     }
   },
   actions: {
