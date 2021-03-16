@@ -66,10 +66,14 @@ export default {
             this.$cookies.set('userId', userId);
             this.$cookies.set('userName', userName);
 
+            const userStatus = response.data.data.user.status;
+            const userRoles = response.data.data.user.roles;
             this.$store.commit({
               type: 'changeUserInfo',
               userId,
-              userName
+              userName,
+              userStatus,
+              userRoles
             });
 
             this.$router.push('/');

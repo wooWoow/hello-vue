@@ -86,7 +86,9 @@ export default {
             this.$store.commit({
               type: 'changeUserInfo',
               userId: userInfo.user_id,
-              userName: userInfo.user_name
+              userName: userInfo.user_name,
+              userStatus: userInfo.user_status,
+              userRoles: userInfo.user_roles
             });
           }
         });

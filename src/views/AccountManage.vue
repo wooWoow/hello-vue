@@ -10,11 +10,11 @@
           <a-icon type="desktop" />
           <span>密码修改</span>
         </a-menu-item>
-        <a-menu-item key="3">
+        <a-menu-item key="3" v-if="userRoles.split(',').indexOf('manager') >= 0">
           <a-icon type="desktop" />
           <span>账户注册</span>
         </a-menu-item>
-        <a-menu-item key="4">
+        <a-menu-item key="4" v-if="userRoles.split(',').indexOf('manager') >= 0">
           <a-icon type="desktop" />
           <span>账号管理</span>
         </a-menu-item>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import UserInfo from '@/components/AccountManage/UserInfo';
 import ChangePassword from '@/components/AccountManage/ChangePassword';
 import AddAcount from '@/components/AccountManage/AddAcount';
@@ -42,6 +43,11 @@ export default {
     ChangePassword,
     AddAcount,
     UserManage
+  },
+  computed: {
+    ...mapState([
+      'userRoles'
+    ])
   },
   data () {
     return {
