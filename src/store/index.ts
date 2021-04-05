@@ -16,6 +16,12 @@ export default new Vuex.Store({
       payload.userName !== undefined && (state.userName = payload.userName);
       payload.userStatus !== undefined && (state.userStatus = payload.userStatus);
       payload.userRoles !== undefined && (state.userRoles = payload.userRoles);
+    },
+    clearUserInfo (state) {
+      state.userId = '';
+      state.userName = '';
+      state.userStatus = '';
+      state.userRoles = '';
     }
   },
   actions: {

@@ -4,6 +4,7 @@ import { getToken } from "./tool";
 import * as _ from "lodash";
 import { logoutNow } from "./tool";
 import { message } from "ant-design-vue";
+import store from "../store/index";
 
 const DevBaseUrl = "/";
 const ProdBashUrl = "/";
@@ -50,8 +51,9 @@ const throttleInstance = _.throttle(
   function() {
     // 401时移除登陆信息
     logoutNow();
+    store.commit({ type: "clearUserInfo" });
 
-    message.error('用户未登录!!'); 
+    message.error("用户未登录!!");
   },
   5000,
   {
