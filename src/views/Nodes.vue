@@ -131,6 +131,7 @@ export default {
   name: 'Nodes',
   data () {
     return {
+      userId: this.$cookies.get('userId'),
       nodeTitle: "",
       content: "",
       nodeList: [],
@@ -208,7 +209,7 @@ export default {
       formData.append('image', $file);
 
       const that = this;
-      Request.post('/v1/info/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+      Request.post('/v1/node/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
         .then(function (response) {
           let path = response.data.data.path || '';
           path = window.location.origin + '/' + path;
@@ -221,7 +222,7 @@ export default {
       this.isNodeChange = true;
     },
     queryNodeType () {
-      Request.get('/v1/info/node/type').then((res) => {
+      Request.get('/v1/node/type').then((res) => {
         if (res?.data?.code === 200 && res?.data?.data) {
           this.nodeTypeList = res.data.data;
 
@@ -253,7 +254,7 @@ export default {
       const formData = {
         nodeTypeStr: this.addNodeTypeStr.trim()
       };
-      Request.post('/v1/info/node/type/add', formData).then(res => {
+      Request.post('/v1/node/type/add', formData).then(res => {
         if (res?.data?.code === 501) {
           this.$message.error(res.data.data.err);
         } else {
@@ -264,7 +265,7 @@ export default {
       });
     },
     delNodeType (nodeTypeId) {
-      const url = `/v1/info/node/type/${nodeTypeId}`;
+      const url = `/v1/node/type/${nodeTypeId}`;
       Request.delete(url).then(res => {
         if (res?.data?.code === 501) {
           this.$message.error(res.data.data.err);
@@ -279,7 +280,7 @@ export default {
       let formData = {
         title: this.nodeTitle,
         content: this.content.replace(new RegExp(regStr, 'g'), '{{REPLACE_URL}}'),
-        userId: this.$store.state.userId,
+        userId: this.userId,
         nodeTypeId: this.nodeTypeId
       };
 
@@ -287,13 +288,13 @@ export default {
         formData = {
           title: this.nodeTitle,
           content: this.content.replace(new RegExp(regStr, 'g'), '{{REPLACE_URL}}'),
-          userId: this.$store.state.userId,
+          userId: this.userId,
           nodeTypeId: this.nodeTypeId,
           nodeId: this.activeNodeId
         };
       }
 
-      Request.post('/v1/info/node/save', formData).then((res) => {
+      Request.post('/v1/node/save', formData).then((res) => {
         if (res?.data?.code === 200) {
           this.queryNodeList(this.activeNodeId === '');
         }
@@ -302,11 +303,11 @@ export default {
     queryNodeList (isInit) {
       const formData = {
         params: {
-          userId: this.$store.state.userId,
+          userId: this.userId,
           display: this.showDustbin ? 0 : 1
         }
       };
-      Request.get('/v1/info/node/query', formData).then(res => {
+      Request.get('/v1/node/query', formData).then(res => {
         if (res?.data?.code === 200 && res?.data?.data) {
           const list = res.data.data;
           list.forEach((item) => {
@@ -350,11 +351,11 @@ export default {
       }
       const formData = {
         params: {
-          userId: this.$store.state.userId,
+          userId: this.userId,
           nodeId: this.activeNodeId
         }
       };
-      Request.get('/v1/info/node/query', formData).then(res => {
+      Request.get('/v1/node/query', formData).then(res => {
         if (res?.data?.code === 200 && res?.data?.data.length > 0) {
           const node = res.data.data[0];
           this.content = node.node_content.replace(/{{REPLACE_URL}}/g, window.location.origin);
@@ -378,10 +379,10 @@ export default {
       this.queryNode(true);
     },
     moveNodeToTrash (item, type) {
-      const url = `/v1/info/node/${item.node_id}`;
+      const url = `/v1/node/${item.node_id}`;
       const formData = {
         params: {
-          userId: this.$store.state.userId
+          userId: this.userId
         }
       };
       if (this.showDustbin && type) { // 删除
