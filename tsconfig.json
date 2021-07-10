@@ -35,6 +35,7 @@
     "tests/**/*.tsx", "src/service/tool.js", "src/service/request.js"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/assets/iconfont"
   ]
 }
