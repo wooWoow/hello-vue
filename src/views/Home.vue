@@ -7,6 +7,15 @@
       <span class="ml-10">采集传感器：DHT22</span>
     </div>
     <div id="home-echarts"></div>
+    <a-divider>房间控制</a-divider>
+    <div class="home-control-box">
+      <div class="home-control-item">
+        台灯 (状态：) <a-switch @change="onSwitchChange" v-model="no1" />
+      </div>
+      <div class="home-control-item">
+        其他 (状态：) <a-switch @change="onSwitchChange" v-model="no2" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -20,11 +29,14 @@ export default {
   data () {
     return {
       humiture: [],
-      tody: moment()
+      tody: moment(),
+      no1: false,
+      no2: true
     };
   },
   created () {
     this.getTodayHours();
+    this.getCurrentRelaysStatus();
   },
   methods: {
     moment,
@@ -155,6 +167,27 @@ export default {
       } else {
         this.getTempAndHum(dateString);
       }
+    },
+    getCurrentRelaysStatus() {
+      Request.get('/v1/home/relays').then(res => {
+        console.log(res);
+        if (res?.data?.code === 200 && res?.data?.data?.info) {
+          const value = res?.data?.data?.info.replace('(', '').replace(')\n', '').split(',').map(item => {
+            return item.trim();
+          });
+          this.no1 = value[0] === 1;
+          this.no2 = value[1] === 1;
+        }
+      });
+    },
+    onSwitchChange () {
+      const formData = {
+        no1: this.no1,
+        no2: this.no2
+      };
+      Request.post('/v1/home/relays', formData).then(res => {
+        console.log(res);
+      });
     }
   }
 };
@@ -175,5 +208,13 @@ export default {
 .date-picker-box {
   width: 180px;
   margin: 0 20px 20px 0;
+}
+.home-control-box {
+  display: flex;
+  margin-bottom: 50px;
+}
+.home-control-item {
+  flex: 1;
+  margin-left: 20px;
 }
 </style>
