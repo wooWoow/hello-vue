@@ -10,10 +10,12 @@
     <a-divider>房间控制</a-divider>
     <div class="home-control-box">
       <div class="home-control-item">
-        台灯 (状态：) <a-switch @change="onSwitchChange" v-model="no1" />
+        台灯 (状态：)
+        <a-switch @change="onSwitchChange" v-model="no1" />
       </div>
       <div class="home-control-item">
-        其他 (状态：) <a-switch @change="onSwitchChange" v-model="no2" />
+        其他 (状态：)
+        <a-switch @change="onSwitchChange" v-model="no2" />
       </div>
     </div>
   </div>
@@ -31,7 +33,7 @@ export default {
       humiture: [],
       tody: moment(),
       no1: false,
-      no2: true
+      no2: false
     };
   },
   created () {
@@ -168,16 +170,23 @@ export default {
         this.getTempAndHum(dateString);
       }
     },
-    getCurrentRelaysStatus() {
-      Request.get('/v1/home/relays').then(res => {
-        console.log(res);
-        if (res?.data?.code === 200 && res?.data?.data?.info) {
-          const value = res?.data?.data?.info.replace('(', '').replace(')\n', '').split(',').map(item => {
-            return item.trim();
-          });
-          this.no1 = value[0] === 1;
-          this.no2 = value[1] === 1;
+    getCurrentRelaysStatus () {
+      Request.get('/v1/home/relays', {
+        params: {
+          gpioId: 22
         }
+      }).then(res => {
+        let status = res.data.data.info.replace('\n', '');
+        status === '1' ? (this.no1 = false) : (this.no1 = true);
+      }).finally(() => {
+        Request.get('/v1/home/relays', {
+          params: {
+            gpioId: 23
+          }
+        }).then(res => {
+          let status = res.data.data.info.replace('\n', '');
+          status === '1' ? (this.no2 = false) : (this.no2 = true);
+        });
       });
     },
     onSwitchChange () {
