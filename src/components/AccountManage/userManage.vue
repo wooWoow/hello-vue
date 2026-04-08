@@ -14,12 +14,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Vue, Options } from 'vue-class-component';
 import Request from '../../service/request';
 import { userStatusFormat } from '../../service/tool';
 import * as _ from 'lodash';
 
-@Component
+@Options({})
 export default class UserManage extends Vue {
   userId = '';
 

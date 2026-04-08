@@ -7,12 +7,12 @@
     </a-button>
 
     <div class="commondItemBox">
-      <template v-for="(item, key) in commandArr" >
-        <span class="commondItem" v-bind:key="key">
-          {{item}}
-          <i class="delCommondItem cursor-pointer" @click="delCommondItem(key)">x</i>
-        </span>
-        <span v-if="commandArr.length !== (key + 1)" v-bind:key="key">  &&  </span>
+      <template v-for="(item, key) in commandArr" :key="key">
+          <span class="commondItem">
+            {{item}}
+            <i class="delCommondItem cursor-pointer" @click="delCommondItem(key)">x</i>
+          </span>
+          <span v-if="commandArr.length !== (key + 1)">  &&  </span>
       </template>
     </div>
 
@@ -23,11 +23,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Vue , Options } from 'vue-class-component';
 import Request from '../service/request';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 
-@Component
+@Options({})
 export default class GoldInfo extends Vue {
   // 命令
   commandStr = '';
@@ -52,12 +52,12 @@ export default class GoldInfo extends Vue {
     setTimeout(() => {
       this.initEditor();
     },500);
-  };
+  }
 
   initEditor() {
     const edit = document.getElementById('container') as HTMLElement;
     this.monacoEditor = monaco.editor.create(edit, this.monacoConfig);
-  };
+  }
 
   commindSearch (skip: boolean) {
     const that = this;
@@ -79,7 +79,7 @@ export default class GoldInfo extends Vue {
     } else {
       that.$message.info('查询参数不能为空！');
     }
-  };
+  }
 
   delCommondItem(index) {
     console.log(index);

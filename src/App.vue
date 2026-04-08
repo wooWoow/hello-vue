@@ -70,8 +70,16 @@ export default {
     const isLogin = getToken();
     if (isLogin) {
       // 更新vuex用户数据
-      const userId = this.$cookies.isKey('userId') && this.$cookies.get('userId');
-      const userName = this.$cookies.isKey('userName') && this.$cookies.get('userName');
+      // 使用原生cookie获取方式，避免依赖问题
+      const getCookie = (name) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+      };
+
+      const userId = getCookie('userId');
+      const userName = getCookie('userName');
 
       if (userId || userName) {
         Request.get('/v1/users/getUserInfo', {

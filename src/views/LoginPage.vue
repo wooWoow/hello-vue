@@ -1,24 +1,18 @@
 <template>
   <div class="login mt-10">
-    <a-form layout="vertical" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" :form="form" @submit="handleSubmit">
-      <a-form-item label="Name" :validate-status="userNameError() ? 'error' : ''" :help="userNameError() || ''">
-        <a-input v-decorator="[
-          'userName',
-          { rules: [{ required: true, message: 'Please input your username!' }] },
-        ]" :placeholder="$t('user_name_placeholder')">
+    <a-form layout="vertical" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" :model="formState" :rules="rules" ref="formRef" @finish="handleSubmit">
+      <a-form-item label="Name" name="userName">
+        <a-input v-model:value="formState.userName" :placeholder="$t('user_name_placeholder')">
           <a-icon slot="prefix" type="user" style="color:rgba(0,0,0,.25)" />
         </a-input>
       </a-form-item>
-      <a-form-item label="Password" :validate-status="passwordError() ? 'error' : ''" :help="passwordError() || ''">
-        <a-input v-decorator="[
-          'passWord',
-          { rules: [{ required: true, message: 'Please input your Password!' }] },
-        ]" type="password" :placeholder="$t('password_placeholder')">
+      <a-form-item label="Password" name="passWord">
+        <a-input v-model:value="formState.passWord" type="password" :placeholder="$t('password_placeholder')">
           <a-icon slot="prefix" type="lock" style="color:rgba(0,0,0,.25)" />
         </a-input>
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit" :disabled="hasErrors(form.getFieldsError())">
+        <a-button type="primary" html-type="submit">
           {{ $t('btn_submit') }}
         </a-button>
       </a-form-item>
@@ -34,7 +28,18 @@ export default {
   name: 'Login',
   data () {
     return {
-      form: this.$form.createForm(this, { name: 'horizontal_login' })
+      formState: {
+        userName: '',
+        passWord: ''
+      },
+      rules: {
+        userName: [
+          { required: true, message: 'Please input your username!', trigger: 'blur' }
+        ],
+        passWord: [
+          { required: true, message: 'Please input your Password!', trigger: 'blur' }
+        ]
+      }
     };
   },
   created: function () {
@@ -42,12 +47,6 @@ export default {
   },
   destroyed: function () {
     console.log('destroyed');
-  },
-  mounted () {
-    this.$nextTick(() => {
-      // To disabled submit button at the beginning.
-      this.form.validateFields();
-    });
   },
   methods: {
     // 登陆
@@ -86,29 +85,8 @@ export default {
         });
     },
 
-    // 姓名校验
-    userNameError () {
-      const { getFieldError, isFieldTouched } = this.form;
-      return isFieldTouched('userName') && getFieldError('userName');
-    },
-
-    // 密码校验
-    passwordError () {
-      const { getFieldError, isFieldTouched } = this.form;
-      return isFieldTouched('passWord') && getFieldError('passWord');
-    },
-
-    handleSubmit (e) {
-      e.preventDefault();
-      this.form.validateFields((err, values) => {
-        if (!err) {
-          this.loginNow(values);
-        }
-      });
-    },
-
-    hasErrors (fieldsError) {
-      return Object.keys(fieldsError).some(field => fieldsError[field]);
+    handleSubmit (values) {
+      this.loginNow(values);
     }
   }
 };

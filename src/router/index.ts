@@ -1,49 +1,40 @@
-import Vue from "vue";
-import VueRouter, { RouteConfig } from "vue-router";
-import Home from "../views/Home.vue";
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
-Vue.use(VueRouter);
+const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import('../views/Home.vue')
+  },
+  {
+    path: '/nodes',
+    name: 'Nodes',
+    component: () => import('../views/Nodes.vue')
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/LoginPage.vue')
+  },
+  {
+    path: '/operations',
+    name: 'Operations',
+    component: () => import('../views/Operations.vue')
+  },
+  {
+    path: '/account',
+    name: 'AccountManage',
+    component: () => import('../views/AccountManage.vue')
+  },
 
-const routes: Array<RouteConfig> = [
   {
-    path: "/",
-    name: "Home",
-    component: Home
-  },
-  {
-    path: "/nodes",
-    name: "Nodes",
-    component: () => import("../views/Nodes.vue")
-  },
-  {
-    path: "/login",
-    name: "Login",
-    component: () => import("../views/LoginPage.vue")
-  },
-  {
-    path: "/operations",
-    name: "Operations",
-    component: () => import("../views/Operations.vue")
-  },
-  {
-    path: "/account",
-    name: "AccountManage",
-    component: () => import("../views/AccountManage.vue")
-  },
-  {
-    path: "/test",
-    name: "test",
-    component: () => import("../../test.vue")
-  },
-  {
-    path: "*",
-    redirect: "/"
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ];
 
-const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes
 });
 

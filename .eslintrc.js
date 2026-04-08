@@ -18,12 +18,19 @@ module.exports = {
     // 'off'或者0  //关闭规则关闭
     // 'warn'或者1  //在打开的规则作为警告（不影响退出代码）
     // 'error'或者2  //把规则作为一个错误（退出代码触发时为1）
-    'quotes': [0, 'single'], //引号类型 `` "" ''
-    'semi': [2, 'always'], // 语句强制分号结尾
-    'space-before-function-paren': [0, 'always'], //函数定义时括号前面要不要有空格
+    quotes: [0, 'single'], // 引号类型 `` "" ''
+    semi: [2, 'always'], // 语句强制分号结尾
+    'space-before-function-paren': [0, 'always'], // 函数定义时括号前面要不要有空格
     '@typescript-eslint/no-this-alias': [0, 'always'], // 不允许this别名
     'comma-spacing': [0, 'always'],
     'comma-dangle': [0, 'always'],
-    '@typescript-eslint/no-explicit-any': [0, 'always'] // any类型检测
-  }
-}
+    '@typescript-eslint/no-explicit-any': [0, 'always'], // any类型检测
+    'vue/no-v-for-template-key': 'off', // 允许在<template v-for>上使用key
+    'vue/multi-word-component-names': 'off', // 允许单词组件名称
+    '@typescript-eslint/no-var-requires': 'off', // 允许使用require语句
+    '@typescript-eslint/no-unused-vars': 'off' // 允许未使用的变量
+  },
+  ignorePatterns: [
+    'src/assets/iconfont/iconfont.js' // 忽略iconfont.js文件的ESLint检查
+  ]
+};

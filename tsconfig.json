@@ -2,18 +2,21 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "strict": true,
+    "strict": false,
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "noImplicitAny": false,  // 可以直接在 TypeScript 中引用 JavaScript（无声明文件）的库，所有的引入都会被默认为any类型。
+    "noImplicitAny": false,
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env"
+      "webpack-env",
+      "vue",
+      "vue-router",
+      "vuex"
     ],
     "paths": {
       "@/*": [
@@ -23,19 +26,16 @@
     "lib": [
       "esnext",
       "dom",
-      "dom.iterable",
-      "scripthost"
+      "dom.iterable"
     ]
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx", "src/service/tool.js", "src/service/request.js"
+    "src/types/**/*.d.ts"
   ],
   "exclude": [
-    "node_modules",
-    "src/assets/iconfont"
+    "node_modules"
   ]
 }

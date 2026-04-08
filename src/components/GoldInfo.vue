@@ -17,11 +17,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Vue, Options } from 'vue-class-component';
 import Request from '../service/request';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 
-@Component
+@Options({})
 export default class GoldInfo extends Vue {
   goldSelet = {
     goldTypes: [
@@ -86,16 +86,16 @@ export default class GoldInfo extends Vue {
     setTimeout(() => {
       this.initEditor();
     },500);
-  };
+  }
 
   initEditor() {
     const edit = document.getElementById('container') as HTMLElement;
     this.monacoEditor = monaco.editor.create(edit, this.monacoConfig);
-  };
+  }
 
   handleChange (value) {
     this.goldSelet.selected = value;
-  };
+  }
 
   queryGoldPlace () {
     const str = this.goldSelet.selected.join(',');
@@ -106,16 +106,16 @@ export default class GoldInfo extends Vue {
           kinds: str
         }
       })
-      .then(response => {
+      .then((response: any) => {
         if (response.data && response.data.code === 200 && response.data.data.code === 200) {
-          that.$message.info(that.$i18n.tc('msg_query_success'));
+          that.$message.info(that.$t('msg_query_success'));
           that.monacoEditor.setValue(JSON.stringify(response.data.data, null, 2));
         }
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.log(error);
       });
-  };
+  }
 }
 </script>
 

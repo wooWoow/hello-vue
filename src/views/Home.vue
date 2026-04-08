@@ -23,7 +23,7 @@
 
 <script>
 import Request from '../service/request';
-import echarts from "echarts";
+import * as echarts from "echarts";
 import moment from 'moment';
 
 export default {
@@ -176,7 +176,7 @@ export default {
           gpioId: 22
         }
       }).then(res => {
-        let status = res.data.data.info.replace('\n', '');
+        const status = res.data.data.info.replace('\n', '');
         status === '1' ? (this.no1 = false) : (this.no1 = true);
       }).finally(() => {
         Request.get('/v1/home/relays', {
@@ -184,7 +184,7 @@ export default {
             gpioId: 23
           }
         }).then(res => {
-          let status = res.data.data.info.replace('\n', '');
+          const status = res.data.data.info.replace('\n', '');
           status === '1' ? (this.no2 = false) : (this.no2 = true);
         });
       });

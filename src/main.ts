@@ -1,6 +1,8 @@
 /* eslint-disable */
-import Vue from "vue";
-import VueCookies from "vue-cookies";
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+import { createApp } from "vue";
+import VueCookies from 'vue3-cookies';
 import App from "./App.vue";
 import "./registerServiceWorker";
 import router from "./router";
@@ -8,34 +10,29 @@ import store from "./store";
 
 // 引入Antd
 import Antd from "ant-design-vue";
-import "ant-design-vue/dist/antd.css";
+import "ant-design-vue/dist/reset.css";
 // 引入i18n国际化插件
-import VueI18n from "vue-i18n";
+import { createI18n } from 'vue-i18n';
 
 // 公共样式
 import "./assets/css/global.scss";
 import "./assets/css/common.scss";
 
-// mavon-editor
-import mavonEditor from "mavon-editor";
-import "mavon-editor/dist/css/index.css";
+// v-md-editor
+import VMdEditor from '@kangc/v-md-editor';
+import '@kangc/v-md-editor/lib/style/base-editor.css';
+import githubTheme from '@kangc/v-md-editor/lib/theme/github';
+import '@kangc/v-md-editor/lib/theme/style/github.css';
+
+// 配置v-md-editor
+VMdEditor.use(githubTheme);
 
 // iconfont svg
 import "@/assets/iconfont/iconfont";
 import "@/assets/iconfont/iconfont.css";
 
-Vue.config.productionTip = false;
-// 使用vue-i18n
-Vue.use(VueI18n);
-// 使用Antd
-Vue.use(Antd);
-// 使用mavon-editor
-Vue.use(mavonEditor);
-// 使用vue-cookies
-Vue.use(VueCookies);
-
 // 注册i18n实例并引入语言文件，文件格式等下解析
-const i18n = new VueI18n({
+const i18n = createI18n({
   locale: localStorage.getItem("locale") || "zh",
   messages: {
     zh: require("@/assets/i18n/ZH_CN/zh.json"),
@@ -43,11 +40,16 @@ const i18n = new VueI18n({
   }
 });
 
-new Vue({
-  router,
-  store,
-  i18n,
-  render: h => h(App)
-}).$mount("#app");
+const app = createApp(App as any);
+
+// 使用插件
+app.use(router);
+app.use(store);
+app.use(i18n);
+app.use(Antd);
+app.use(VMdEditor);
+app.use(VueCookies);
+
+app.mount("#app");
 
 /* eslint-disable no-new */

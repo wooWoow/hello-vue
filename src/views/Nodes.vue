@@ -96,9 +96,19 @@
         </a-modal>
       </div>
       <div class="edit-box">
-        <mavon-editor ref="md" placeholder="请输入文档内容..." :boxShadow="false" id="mavon-editor" v-model="content"
-          :toolbarsFlag="editModel" :toolbars="toolbars" :subfield="editModel" :defaultOpen="'preview'"
-          @imgAdd="$imgAdd" @change="$editorChange" @save="saveContent" />
+        <v-md-editor
+          v-if="editModel"
+          v-model="content"
+          placeholder="请输入文档内容..."
+          @change="$editorChange"
+          class="editor"
+        />
+        <v-md-editor
+          v-else
+          :model-value="content"
+          mode="preview"
+          class="editor"
+        />
       </div>
     </div>
   </div>
@@ -203,21 +213,7 @@ export default {
     console.log('mounted');
   },
   methods: {
-    // 上传图片方法
-    $imgAdd (pos, $file) {
-      const formData = new FormData();
-      formData.append('image', $file);
 
-      const that = this;
-      Request.post('/v1/node/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-        .then(function (response) {
-          let path = response.data.data.path || '';
-          path = window.location.origin + '/' + path;
-          setTimeout(() => {
-            that.$refs.md.$img2Url(pos, path);
-          }, 5000);
-        });
-    },
     $editorChange () {
       this.isNodeChange = true;
     },
@@ -426,7 +422,7 @@ export default {
 };
 </script>
 <style lang="scss">
-#mavon-editor {
+.editor {
   z-index: 1;
   border: 1px solid #d9d9d9;
   height: 100%;
